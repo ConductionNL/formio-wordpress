@@ -52,7 +52,7 @@ class FormioEndpoint
         // Check if Gravity Form is founds
         if (!isset($gForm) || !$gForm) {
             return [
-                'message' => 'Gravity Form with id: ' . $data['id'] . ' is not installed',
+                'message' => 'Gravity Form with id: ' . $data['id'] . ' is not found',
                 'data' => $data['id']
             ];
         }
@@ -70,11 +70,11 @@ class FormioEndpoint
 
         if (isset($form['fields'])) {
             foreach ($form['fields'] as $field) {
-                $components[] = [
+                $component = [
                     'input' => true,
                     'label' => $field['label'],
-                    'type' => $field['type'] === 'text' ? 'textfield' : $field['type'],
-                    'key' => $field['adminLabel'] ?? $field['label'],
+                    'type' => $this->getComponentType($field['type']),
+                    'key' => !empty($field['adminLabel']) ? $field['adminLabel'] : $field['label'],
                     'id' => $field['id'] ?? null,
                     'size' => $this->getComponentSize($field['size']),
                     'description' => $field['description'],
@@ -83,6 +83,14 @@ class FormioEndpoint
                         'required' => $field['isRequired']
                     ]
                 ];
+
+                // Set choices
+                if (isset($field['choices']) && is_array($field['choices'])) {
+                    $component['widget'] = 'choicesjs';
+                    $component = $this->setInputChoices($component, $field['choices']);
+                }
+
+                $components[] = $component;
             }
         }
 
@@ -101,7 +109,7 @@ class FormioEndpoint
             'size'             => 'md',
             'key'              => 'submit',
             'tableView'        => false,
-            'label'            => $button['submit'],
+            'label'            => $button['text'] ?? 'Submit',
             'input'            => 'true',
         ];
     }
@@ -118,5 +126,46 @@ class FormioEndpoint
             case 'extra-large':
                 return 'xl';
         }
+    }
+
+    private function getComponentType(string $type): string
+    {
+        switch ($type) {
+            case 'string':
+            case 'text':
+            case 'textfield':
+                return 'textfield';
+            case 'number':
+            case 'int':
+            case 'integer':
+            case 'float':
+                return 'number';
+            case 'boolean':
+            case 'checkbox':
+                return 'checkbox';
+            case 'email':
+                return 'email';
+            default:
+                return 'textfield';
+        }
+    }
+
+    private function setInputChoices(array $component, array $choices): array
+    {
+        $component['dataSrc'] = 'values';
+        foreach ($choices as $choice) {
+            $newValue = [
+                'label' => $choice['text'],
+                'value' => $choice['value']
+            ];
+
+            $component['type'] === 'radio' ?
+                $component['values'][] = $newValue :
+                $component['data']['values'][] = $newValue;
+
+            $choice['isSelected'] && $component['defaultValue'] = $choice['value'];
+        }
+
+        return $component;
     }
 }
