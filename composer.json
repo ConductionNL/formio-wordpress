@@ -1,0 +1,5 @@
+{
+    "name": "plugin/formio-wordpress",
+    "description": "Formio Wordpress",
+    "type": "wordpress-plugin"
+}
