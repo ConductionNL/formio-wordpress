@@ -34,8 +34,7 @@ class FormioEndpoint
             'key'              => 'submit',
             'tableView'        => false,
             'label'            => $button['text'] ?? 'Submit',
-            'input'            => 'true',
-            'customClass'      => 'utrecht-button'
+            'input'            => 'true'
         ];
     }
 

@@ -12,7 +12,7 @@
  * Plugin Name:       Formio
  * Plugin URI:        https://conduction.nl/formio
  * Description:       De formio plugin
- * Version:           1.0.9
+ * Version:           1.0.10
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Conduction
