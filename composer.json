@@ -1,5 +1,5 @@
 {
-    "require": {
-        "php": "^7.4.0"
-    }
+    "name": "plugin/formio-wordpress",
+    "description": "Formio Wordpress",
+    "type": "wordpress-plugin"
 }
