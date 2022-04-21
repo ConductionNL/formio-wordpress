@@ -35,6 +35,7 @@ class FormioEndpoint
             'tableView'        => false,
             'label'            => $button['text'] ?? 'Submit',
             'input'            => 'true',
+            'customClass'      => 'utrecht-button'
         ];
     }
 
@@ -66,12 +67,6 @@ class FormioEndpoint
      */
     private function getComponentType(string $type): string
     {
-        // If type itself is valid return that
-        $alreadyValidTypes = ['textfield', 'number', 'checkbox', 'email', 'time', 'datetime'];
-        if (in_array($type, $alreadyValidTypes)) {
-            return $type;
-        }
-
         // Check type and translate to formio type
         switch ($type) {
             case 'string':
@@ -156,6 +151,48 @@ class FormioEndpoint
     }
 
     /**
+     * Creates NL Design class for component
+     * 
+     * @param array $type     Field type 
+     * @param array $required If this field is required or not 
+     * @return array nl design className
+     */
+    private function getCustomClass(string $type, bool $required): string
+    {
+        $customClass = '';
+        switch ($type) {
+            case 'textfield':
+                $customClass = 'utrecht-textbox utrecht-textbox--html-input';
+                $required && $customClass .= ' utrecht-textbox--required';
+                break;
+            case 'textarea':
+                $customClass = 'utrecht-textarea utrecht-textarea--html-textarea';
+                $required && $customClass .= ' utrecht-textarea--required';
+                break;
+            case 'number':
+                $customClass = 'utrecht-number utrecht-number--html-number';
+                $required && $customClass .= ' utrecht-number--required';
+                break;
+            case 'select':
+            case 'selectboxes':
+                $customClass = 'utrecht-select utrecht-select--html-select';
+                break;
+            case 'checkbox':
+                $customClass = 'utrecht-checkbox utrecht-checkbox--html-input';
+                break;
+            case 'radio':
+                $customClass = 'utrecht-radio-button utrecht-radio-button--html-input';
+                break;
+            default:
+                $customClass = 'utrecht-textbox utrecht-textbox--html-input';
+                $required && $customClass .= ' utrecht-textbox--required';
+                break;
+        }
+
+        return $customClass;
+    }
+
+    /**
      * Creates form.io componentes based on gravity form fields
      * 
      * @param array $form Gravity Forms form 
@@ -184,6 +221,8 @@ class FormioEndpoint
                     ],
                     'defaultValue' => $field['defaultValue']
                 ];
+
+                $component['customClass'] = $this->getCustomClass($component['type'], $field['isRequired']);
 
                 $components[] = $this->createAdvancedValues($component, $field);
             }
