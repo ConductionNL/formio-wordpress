@@ -309,7 +309,7 @@ class FormioEndpoint
         $iteratedIDs = [];
         foreach ($gForm['fields'] as $field) {
             foreach ($postedBody as $key => $value) {
-                if (!in_array($field['id'], $iteratedIDs) && $key == $field['adminLabel']) {
+                if (!in_array($field['id'], $iteratedIDs) && ($key == $field['adminLabel'] || $key == $field['label'])) {
                     $body['input_' . $field['id']] = $value;
                 }
             }
