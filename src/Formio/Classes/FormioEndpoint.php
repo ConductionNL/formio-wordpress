@@ -200,7 +200,7 @@ class FormioEndpoint
      * @param array $data Options for the function.
      * @return array      form.io array
      */
-    public function gf_to_formio($data)
+    public function gf_to_formio($request)
     {
         // Check if Gravity Forms is installed
         if (!class_exists('GFAPI')) {
@@ -208,18 +208,18 @@ class FormioEndpoint
         }
 
         // Check if id is given
-        if (!isset($data['id'])) {
+        if (!isset($request['id'])) {
             return ['message' => 'No id given'];
         }
 
         // Get Gravity Form with id
-        $gForm = \GFAPI::get_form($data['id']);
+        $gForm = \GFAPI::get_form($request['id']);
 
         // Check if Gravity Form is founds
         if (!isset($gForm) || !$gForm) {
             return [
-                'message' => 'Gravity Form with id: ' . $data['id'] . ' is not found',
-                'data' => $data['id']
+                'message' => 'Gravity Form with id: ' . $request['id'] . ' is not found',
+                'data' => $request['id']
             ];
         }
 
@@ -237,10 +237,49 @@ class FormioEndpoint
      * @param array $data Options for the function.
      * @return array      form.io array
      */
-    public function formio_post($data)
+    public function formio_post($request)
     {
-        // @TODO
-        return $data['id'];
+        // Check if Gravity Forms is installed
+        if (!class_exists('GFAPI')) {
+            return ['message' => 'Gravity Forms is not installed'];
+        }
+
+        // Check if id is given
+        if (!isset($request['id'])) {
+            return ['message' => 'No id given'];
+        } else {
+            $id = $request['id'];
+        }
+
+        // Get form from Gravity Forms plugin
+        $gForm = \GFAPI::get_form($id);
+
+        // Check if Gravity Form is founds
+        if (!isset($gForm) || !$gForm) {
+            return [
+                'message' => 'Gravity Form with id: ' . $id . ' is not found',
+                'data' => $id
+            ];
+        }
+
+        // Get body
+        $postedBody = json_decode($request->get_body(), true);
+
+        // Map incomming body to a gravity forms submit body
+        $body = [];
+        $iteratedIDs = [];
+        foreach ($gForm['fields'] as $field) {
+            foreach ($postedBody as $key => $value) {
+                if (!in_array($field['id'], $iteratedIDs) && $key == $field['adminLabel']) {
+                    $body['input_' . $field['id']] = $value;
+                }
+            }
+        }
+
+        $body['formId'] = $id;
+        $result = \GFAPI::submit_form($id, $body);
+
+        return $result;
     }
 
     /**
@@ -249,14 +288,16 @@ class FormioEndpoint
     private function load_hooks(): void
     {
         add_action('rest_api_init', function () {
-            register_rest_route('owc/v1', '/gf-formio/(?P<id>\d+)', array(
-                'methods' => 'GET',
-                'callback' => [$this, 'gf_to_formio'],
-            ));
-            register_rest_route('owc/v1', '/gf-formio/(?P<id>\d+)', array(
-                'methods' => 'POST',
-                'callback' => [$this, 'formio_post'],
-            ));
+            register_rest_route('owc/v1', '/gf-formio/(?P<id>\d+)', [
+                [
+                    'methods' => 'GET',
+                    'callback' => [$this, 'gf_to_formio'],
+                ],
+                [
+                    'methods' => 'POST',
+                    'callback' => [$this, 'formio_post'],
+                ]
+            ]);
         });
     }
 }
