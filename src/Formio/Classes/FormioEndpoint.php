@@ -200,7 +200,7 @@ class FormioEndpoint
      * @param array $data Options for the function.
      * @return array      form.io array
      */
-    public function gravityFormToFormIO($data)
+    public function gf_to_formio($data)
     {
         // Check if Gravity Forms is installed
         if (!class_exists('GFAPI')) {
@@ -237,7 +237,7 @@ class FormioEndpoint
      * @param array $data Options for the function.
      * @return array      form.io array
      */
-    public function formIOPost($data)
+    public function formio_post($data)
     {
         // @TODO
         return $data['id'];
@@ -251,11 +251,11 @@ class FormioEndpoint
         add_action('rest_api_init', function () {
             register_rest_route('owc/v1', '/gf-formio/(?P<id>\d+)', array(
                 'methods' => 'GET',
-                'callback' => [$this, 'gravityFormToFormIO'],
+                'callback' => [$this, 'gf_to_formio'],
             ));
             register_rest_route('owc/v1', '/gf-formio/(?P<id>\d+)', array(
                 'methods' => 'POST',
-                'callback' => [$this, 'formIOPost'],
+                'callback' => [$this, 'formio_post'],
             ));
         });
     }
