@@ -12,7 +12,7 @@
  * Plugin Name:       Formio
  * Plugin URI:        https://conduction.nl/formio
  * Description:       De formio plugin
- * Version:           1.0.8
+ * Version:           1.0.9
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Conduction
@@ -29,7 +29,7 @@ use OWC\Formio\Foundation\Plugin;
  * If this file is called directly, abort.
  */
 if (!defined('WPINC')) {
-    die;
+  die;
 }
 
 /**
@@ -47,7 +47,7 @@ $plugin = (new Plugin(__DIR__))->boot();
  * Start session on init when there is none.
  */
 add_action('init', function () {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+  if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+  }
 });

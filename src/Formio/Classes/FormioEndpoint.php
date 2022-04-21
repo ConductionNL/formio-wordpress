@@ -222,7 +222,7 @@ class FormioEndpoint
                     'defaultValue' => $field['defaultValue']
                 ];
 
-                $component['customClass'] = $this->getCustomClass($component['type'], $field['isRequired']);
+                // $component['customClass'] = $this->getCustomClass($component['type'], $field['isRequired']);
 
                 $components[] = $this->createAdvancedValues($component, $field);
             }
