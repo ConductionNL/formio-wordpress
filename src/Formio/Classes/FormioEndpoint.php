@@ -215,9 +215,6 @@ class FormioEndpoint
                     'validation' => [
                         'required' => $field['isRequired']
                     ],
-                    'widget' => [
-                        'type' => 'input'
-                    ],
                     'defaultValue' => $field['defaultValue']
                 ];
 
